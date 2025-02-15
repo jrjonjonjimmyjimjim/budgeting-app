@@ -8,15 +8,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.static('public'));
 
 app.get('/', async (req, res) => {
-    const expenses = await sql`
-    select
-      date,
-      amount
-    from expense
-  `;
-
-    console.info(expenses);
-    res.send(createRootTemplate());
+    res.send(await createRootTemplate({ month: 202502 }));
 });
 
 app.listen(3000, () => {

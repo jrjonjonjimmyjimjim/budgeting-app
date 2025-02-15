@@ -3,11 +3,12 @@ import createRolloverTableTemplate from "./rolloverTable.js";
 import createExpenseCategoriesTemplate from "./expenseCategories.js";
 import createSummaryTemplate from "./summary.js";
 
-function createRootTemplate () {
+async function createRootTemplate ({ month }) {
     return /*html*/`
     <html>
     <head>
         <script src="/js/bootstrap.js" defer></script>
+        <script src="/js/htmx.min.js" defer></script>
         <link href="/css/bootstrap.css" rel="stylesheet">
     </head>
     <body>
@@ -16,7 +17,7 @@ function createRootTemplate () {
             <div class="row">
                 <div class="col-7">
                     ${createRolloverTableTemplate()}
-                    ${createIncomeTableTemplate()}
+                    ${await createIncomeTableTemplate({ month })}
                     <div id="total-to-allocate-line">Total to allocate: $5320.27</div>
                     ${createExpenseCategoriesTemplate()}
                 </div>

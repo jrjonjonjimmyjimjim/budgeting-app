@@ -11,7 +11,6 @@ async function createIncomeTableTemplate ({ month }) {
         WHERE
             month = ${month}
     `;
-    console.log('createIncomeTableTemplate items', items);
 
     return /*html*/`
     <h2>Income</h2>
@@ -39,7 +38,7 @@ async function createIncomeTableTemplate ({ month }) {
                     .value()
             }
             <tr class="total-line">
-                <td>TOTAL (Calculated)</td>
+                <td>TOTAL</td>
                 <td>${(_.sumBy(items, (item) => Number(item.amount))).toFixed(2)}</td>
                 <td hx-get="/${month}/income/new_item/">New</td>
             </tr>

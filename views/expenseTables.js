@@ -1,4 +1,4 @@
-function createExpenseCategoriesTemplate () {
+function createExpenseTablesTemplate () {
     return /*html*/`
     <h2>Transportation</h2>
     <table class="table">
@@ -30,4 +30,4 @@ function createExpenseCategoriesTemplate () {
     `;
 }
 
-export default createExpenseCategoriesTemplate;
+export default createExpenseTablesTemplate;

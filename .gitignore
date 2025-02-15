@@ -145,3 +145,6 @@ dist
 
 # MacOS Garbage
 .DS_Store
+
+# Project-specific
+config.json

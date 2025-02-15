@@ -1,0 +1,6 @@
+{
+    "postgresOptions": {
+        "user": "postgres",
+        "password": "pass"
+    }
+}

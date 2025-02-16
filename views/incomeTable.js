@@ -42,7 +42,7 @@ async function createIncomeTableTemplate ({ month }) {
             <tr class="total-line">
                 <td>TOTAL</td>
                 <td>${(_.sumBy(items, (item) => Number(item.amount))).toFixed(2)}</td>
-                <td hx-get="/${month}/income/new_item/">New</td>
+                <td hx-get="/${month}/income/new_item/" hx-target="closest tr" hx-swap="beforebegin">New</td>
             </tr>
         </tbody>
     </table>

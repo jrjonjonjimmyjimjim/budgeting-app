@@ -2,6 +2,7 @@ import express from 'express';
 import sql from './sql.js';
 import createRootTemplate from './views/root.js';
 import createSummaryTemplate from './views/summary.js';
+import createNewIncomeItemTemplate from './views/newIncomeItem.js';
 import createIncomeItemTemplate from './views/incomeItem.js';
 import createIncomeTableTemplate from './views/incomeTable.js';
 
@@ -33,12 +34,25 @@ app.get('/:month/summary', async (req, res) => {
 app.get('/:month/income/:name', async (req, res) => {
     const { month, name } = req.params;
 
-    if (name === 'new') {
-        res.send()
+    if (name === 'new_item') {
+        res.send(await createNewIncomeItemTemplate({ month }));
         return;
     }
 
     res.send(await createIncomeItemTemplate({ month, name }));
+});
+
+app.post('/:month/income', async (req, res) => {
+    const { month } = req.params;
+    const { item_name, item_amount } = req.body;
+
+    await sql`
+        INSERT INTO income_item (name, amount, month)
+        VALUES (${item_name}, ${item_amount}, ${month})
+    `;
+
+    res.set('HX-Trigger', 'recalc-totals');
+    res.send(await createIncomeTableTemplate({ month }));
 });
 
 app.put('/:month/income/:name', async (req, res) => {
@@ -65,6 +79,7 @@ app.delete('/:month/income/:name', async (req, res) => {
         WHERE month = ${month} AND name = ${name}
     `;
     
+    res.set('HX-Trigger', 'recalc-totals');
     res.send(await createIncomeTableTemplate({ month }));
 });
 

@@ -28,7 +28,7 @@ async function createRolloverTableTemplate ({ month }) {
     }
 
     const previousMonth = _calculatePreviousMonth({ month });
-    const spendItems = await sql`
+    const spendItemsRaw = await sql`
         SELECT
             name,
             amount,
@@ -38,6 +38,7 @@ async function createRolloverTableTemplate ({ month }) {
             spend_item
         WHERE
             month = ${previousMonth}
+        ORDER BY name
     `;
     const expenses = await sql`
         SELECT
@@ -49,9 +50,10 @@ async function createRolloverTableTemplate ({ month }) {
             expense
         WHERE
             month = ${previousMonth}
+        ORDER BY name
     `;
 
-    const spendItemsByCategory = _.groupBy(spendItems, 'category');
+    const spendItemsByCategory = _.groupBy(spendItemsRaw, 'category');
     const rolloverLines = _.map(spendItemsByCategory, (spendItems, category) => {
         const categoryStartAmount = _.sumBy(spendItems, (spendItem) => {
             if (!spendItem.is_tracked) {

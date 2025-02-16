@@ -1,6 +1,6 @@
 import createIncomeTableTemplate from "./incomeTable.js";
 import createRolloverTableTemplate from "./rolloverTable.js";
-import createExpenseTablesTemplate from "./expenseTables.js";
+import createSpendTablesTemplate from "./spendTables.js";
 import createSummaryTemplate from "./summary.js";
 
 async function createRootTemplate ({ month }) {
@@ -15,13 +15,14 @@ async function createRootTemplate ({ month }) {
         <h1>Hello world!</h1>
         <div class="container">
             <div class="row">
-                <div class="col-7">
+                <div class="col-8 vstack gap-3">
                     ${await createRolloverTableTemplate({ month })}
                     ${await createIncomeTableTemplate({ month })}
-                    ${createExpenseTablesTemplate()}
+                    <hr>
+                    ${await createSpendTablesTemplate({ month })}
                 </div>
-                <div class="col-5">
-                    ${createSummaryTemplate()}
+                <div class="col-4">
+                    ${await createSummaryTemplate({ month })}
                 </div>
             </div>
         </div>

@@ -10,9 +10,11 @@ async function createIncomeTableTemplate ({ month }) {
             income_item
         WHERE
             month = ${month}
+        ORDER BY name
     `;
 
     return /*html*/`
+    <div>
     <h2>Income</h2>
     <table class="table">
         <thead>
@@ -30,7 +32,7 @@ async function createIncomeTableTemplate ({ month }) {
                             <tr>
                                 <td>${item.name}</td>
                                 <td>${item.amount}</td>
-                                <td hx-get="/${month}/income/${item.name}/">Edit</td>
+                                <td hx-get="/${month}/income/${item.name}/" hx-target="closest tr" hx-swap="outerHTML">Edit</td>
                             </tr>
                         `
                     )
@@ -44,6 +46,7 @@ async function createIncomeTableTemplate ({ month }) {
             </tr>
         </tbody>
     </table>
+    </div>
     `;
 }
 

@@ -1,9 +1,10 @@
 import _ from 'lodash';
-import sql from '../sql.js';
+import database from '../database.js';
 
 async function createSpendTablesTemplate ({ month }) {
-    const spendItemsRaw = await sql`
+    const spendItemsRawQuery = database.prepare(`
         SELECT
+            key,
             name,
             amount,
             category,
@@ -11,10 +12,11 @@ async function createSpendTablesTemplate ({ month }) {
         FROM
             spend_item
         WHERE
-            month = ${month}
+            month = ?
         ORDER BY name
-    `;
-    const expenses = await sql`
+    `);
+    const spendItemsRaw = spendItemsRawQuery.all(month);
+    const expensesQuery = database.prepare(`
         SELECT
             name,
             amount,
@@ -23,9 +25,10 @@ async function createSpendTablesTemplate ({ month }) {
         FROM
             expense
         WHERE
-            month = ${month}
+            month = ?
         ORDER BY name
-    `;
+    `);
+    const expenses = expensesQuery.all(month);
 
     const spendItemsByCategory = _.groupBy(spendItemsRaw, 'category');
     const expensesBySpendItem = _.groupBy(expenses, 'spend_item');
@@ -34,6 +37,7 @@ async function createSpendTablesTemplate ({ month }) {
             const expensesForSpendItem = expensesBySpendItem[spendItem.name];
             const totalExpensesForSpendItem = _.sumBy(expensesForSpendItem, (expenseForSpendItem) => Number(expenseForSpendItem.amount));
             return {
+                key: spendItem.key,
                 name: spendItem.name,
                 amount: spendItem.amount,
                 spent: totalExpensesForSpendItem.toFixed(2),
@@ -51,6 +55,7 @@ async function createSpendTablesTemplate ({ month }) {
         _.chain(spendCategories)
             .map((spendCategory) =>
                 /*html*/`
+                    <div>
                     <h2>${spendCategory.category}</h2>
                     <table class="table">
                         <thead>
@@ -72,7 +77,7 @@ async function createSpendTablesTemplate ({ month }) {
                                                 <td>${item.amount}</td>
                                                 <td>${item.spent}</td>
                                                 <td>${item.remain}</td>
-                                                <td>Edit</td>
+                                                <td hx-get="/spend/${item.key}/" hx-target="closest tr" hx-swap="outerHTML">Edit</td>
                                             </tr>
                                         `
                                     )
@@ -84,10 +89,11 @@ async function createSpendTablesTemplate ({ month }) {
                                 <td>${(_.sumBy(spendCategory.items, (item) => Number(item.amount))).toFixed(2)}</td>
                                 <td>${(_.sumBy(spendCategory.items, (item) => Number(item.spent))).toFixed(2)}</td>
                                 <td>${(_.sumBy(spendCategory.items, (item) => Number(item.remain))).toFixed(2)}</td>
-                                <td>New</td>
+                                <td hx-get="/spend/new_item/${month}/${spendCategory.category}" hx-target="closest tr" hx-swap="beforebegin">New</td>
                             </tr>
                         </tbody>
                     </table>
+                    </div>
                 `
             )
             .join('')

@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import sql from '../sql.js';
+import database from '../database.js';
 
 async function createRolloverTableTemplate ({ month }) {
 
@@ -28,7 +28,7 @@ async function createRolloverTableTemplate ({ month }) {
     }
 
     const previousMonth = _calculatePreviousMonth({ month });
-    const spendItemsRaw = await sql`
+    const spendItemsRawQuery = database.prepare(`
         SELECT
             name,
             amount,
@@ -37,10 +37,11 @@ async function createRolloverTableTemplate ({ month }) {
         FROM
             spend_item
         WHERE
-            month = ${previousMonth}
+            month = ?
         ORDER BY name
-    `;
-    const expenses = await sql`
+    `);
+    const spendItemsRaw = spendItemsRawQuery.all(previousMonth);
+    const expensesQuery = database.prepare(`
         SELECT
             name,
             amount,
@@ -49,9 +50,10 @@ async function createRolloverTableTemplate ({ month }) {
         FROM
             expense
         WHERE
-            month = ${previousMonth}
+            month = ?
         ORDER BY name
-    `;
+    `);
+    const expenses = expensesQuery.all(previousMonth);
 
     const spendItemsByCategory = _.groupBy(spendItemsRaw, 'category');
     const rolloverLines = _.map(spendItemsByCategory, (spendItems, category) => {

@@ -1,17 +1,19 @@
 import _ from 'lodash';
-import sql from '../sql.js';
+import database from '../database.js';
 
 async function createIncomeTableTemplate ({ month }) {
-    const items = await sql`
+    const itemsQuery = database.prepare(`
         SELECT
+            key,
             name,
             amount
         FROM
             income_item
         WHERE
-            month = ${month}
+            month = ?
         ORDER BY name
-    `;
+    `);
+    const items = itemsQuery.all(month);
 
     return /*html*/`
     <div>
@@ -31,8 +33,8 @@ async function createIncomeTableTemplate ({ month }) {
                         /*html*/`
                             <tr>
                                 <td>${item.name}</td>
-                                <td>${item.amount}</td>
-                                <td hx-get="/${month}/income/${item.name}/" hx-target="closest tr" hx-swap="outerHTML">Edit</td>
+                                <td>${item.amount.toFixed(2)}</td>
+                                <td hx-get="/income/${item.key}" hx-target="closest tr" hx-swap="outerHTML">Edit</td>
                             </tr>
                         `
                     )
@@ -41,8 +43,8 @@ async function createIncomeTableTemplate ({ month }) {
             }
             <tr class="total-line">
                 <td>TOTAL</td>
-                <td>${(_.sumBy(items, (item) => Number(item.amount))).toFixed(2)}</td>
-                <td hx-get="/${month}/income/new_item/" hx-target="closest tr" hx-swap="beforebegin">New</td>
+                <td>${(_.sumBy(items, (item) => item.amount)).toFixed(2)}</td>
+                <td hx-get="/income/new_item/${month}" hx-target="closest tr" hx-swap="beforebegin">New</td>
             </tr>
         </tbody>
     </table>

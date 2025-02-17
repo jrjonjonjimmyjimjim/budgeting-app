@@ -1,5 +1,5 @@
 import express from 'express';
-import sql from './sql.js';
+import database from './database.js';
 import createRootTemplate from './views/root.js';
 import createSummaryTemplate from './views/summary.js';
 import createNewIncomeItemTemplate from './views/newIncomeItem.js';
@@ -25,62 +25,91 @@ app.get('/', async (req, res) => {
     res.send(await createRootTemplate({ month: monthString }));
 });
 
-app.get('/:month/summary', async (req, res) => {
+app.get('/summary/:month', async (req, res) => {
     const { month } = req.params;
-
     res.send(await createSummaryTemplate({ month }));
 });
 
-app.get('/:month/income/:name', async (req, res) => {
-    const { month, name } = req.params;
-
-    if (name === 'new_item') {
-        res.send(await createNewIncomeItemTemplate({ month }));
-        return;
-    }
-
-    res.send(await createIncomeItemTemplate({ month, name }));
+app.get('/income/new_item/:month', async (req, res) => {
+    const { month } = req.params;
+    res.send(createNewIncomeItemTemplate({ month }));
 });
 
-app.post('/:month/income', async (req, res) => {
+app.get('/income/:incomeItem', async (req, res) => {
+    const { incomeItem } = req.params;
+    res.send(await createIncomeItemTemplate({ incomeItem }));
+});
+
+app.get('/spend/new_item/:month/:category', async (req, res) => {
+    const { month, category } = req.params;
+    res.send(createNewSpendItemTemplate({ month, category }));
+});
+
+app.get('/spend/:spend_item', async (req, res) => {
+    const { spend_item } = req.params;
+    res.send(await createSpendItemTemplate({ spend_item }));
+});
+
+app.post('/income/new_item/:month', async (req, res) => {
     const { month } = req.params;
     const { item_name, item_amount } = req.body;
 
-    await sql`
+    const income_itemInsert = database.prepare(`
         INSERT INTO income_item (name, amount, month)
-        VALUES (${item_name}, ${item_amount}, ${month})
-    `;
+        VALUES (?, ?, ?)
+    `);
+    income_itemInsert.run(item_name, item_amount, month);
 
     res.set('HX-Trigger', 'recalc-totals');
     res.send(await createIncomeTableTemplate({ month }));
 });
 
-app.put('/:month/income/:name', async (req, res) => {
-    const { month, name } = req.params;
+app.put('/income/:incomeItem', async (req, res) => {
+    const { incomeItem } = req.params;
     const { item_name, item_amount } = req.body;
 
+    const income_itemQuery = database.prepare(`
+        SELECT
+            month
+        FROM
+            income_item
+        WHERE
+            key = ?
+    `);
+    const income_item = income_itemQuery.get(incomeItem);
     // TODO: Find existing expenses that were pointing to this income item and update them
-    await sql`
+    const income_itemUpdate = database.prepare(`
         UPDATE income_item
-        SET name = ${item_name}, amount = ${item_amount}
-        WHERE month = ${month} AND name = ${name}
-    `;
+        SET name = ?, amount = ?
+        WHERE key = ?
+    `);
+    income_itemUpdate.run(item_name, item_amount, incomeItem);
     
     res.set('HX-Trigger', 'recalc-totals');
-    res.send(await createIncomeTableTemplate({ month }));
+    res.send(await createIncomeTableTemplate({ month: income_item.month }));
 });
 
-app.delete('/:month/income/:name', async (req, res) => {
-    const { month, name } = req.params;
+app.delete('/income/:incomeItem', async (req, res) => {
+    const { incomeItem } = req.params;
 
+    const income_itemQuery = database.prepare(`
+        SELECT
+            month
+        FROM
+            income_item
+        WHERE
+            key = ?
+    `);
+    const income_item = income_itemQuery(incomeItem)
     // TODO: Find existing expenses that were pointing to this income item and... reassign them?
-    await sql`
+    const income_itemDelete = database.prepare(`
         DELETE FROM income_item
-        WHERE month = ${month} AND name = ${name}
-    `;
+        WHERE key = ?
+    `);
+    income_itemDelete.run(incomeItem);
     
     res.set('HX-Trigger', 'recalc-totals');
-    res.send(await createIncomeTableTemplate({ month }));
+    res.send(await createIncomeTableTemplate({ month: income_item.month }));
 });
 
 app.listen(3000, () => {

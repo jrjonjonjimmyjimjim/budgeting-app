@@ -1,18 +1,19 @@
 import _ from 'lodash';
-import sql from '../sql.js';
+import database from '../database.js';
 
 async function createSummaryTemplate ({ month }) {
-    const incomeItems = await sql`
+    const incomeItemsQuery = database.prepare(`
         SELECT
             name,
             amount
         FROM
             income_item
         WHERE
-            month = ${month}
+            month = ?
         ORDER BY name
-    `;
-    const spendItems = await sql`
+    `);
+    const incomeItems = incomeItemsQuery.all(month);
+    const spendItemsQuery = database.prepare(`
         SELECT
             name,
             amount,
@@ -21,9 +22,10 @@ async function createSummaryTemplate ({ month }) {
         FROM
             spend_item
         WHERE
-            month = ${month}
+            month = ?
         ORDER BY name
-    `;
+    `);
+    const spendItems = spendItemsQuery.all(month);
 
     // copy-pasta
     //
@@ -53,7 +55,7 @@ async function createSummaryTemplate ({ month }) {
     }
 
     const previousMonth = _calculatePreviousMonth({ month });
-    const prevMonthSpendItemsRaw = await sql`
+    const prevMonthSpendItemsRawQuery = database.prepare(`
         SELECT
             name,
             amount,
@@ -62,10 +64,11 @@ async function createSummaryTemplate ({ month }) {
         FROM
             spend_item
         WHERE
-            month = ${previousMonth}
+            month = ?
         ORDER BY name
-    `;
-    const prevMonthExpenses = await sql`
+    `);
+    const prevMonthSpendItemsRaw = prevMonthSpendItemsRawQuery.all(previousMonth);
+    const prevMonthExpensesQuery = database.prepare(`
         SELECT
             name,
             amount,
@@ -74,9 +77,10 @@ async function createSummaryTemplate ({ month }) {
         FROM
             expense
         WHERE
-            month = ${previousMonth}
+            month = ?
         ORDER BY name
-    `;
+    `);
+    const prevMonthExpenses = prevMonthExpensesQuery.all(previousMonth);
 
     const spendItemsByCategory = _.groupBy(prevMonthSpendItemsRaw, 'category');
     // leaving this copy pasta so that once i refactor, summary.js can just take in `rolloverLines`
@@ -104,7 +108,7 @@ async function createSummaryTemplate ({ month }) {
     const totalAllocated = _.sumBy(spendItems, (item) => Number(item.amount));
 
     return /*html*/`
-    <div hx-get="/${month}/summary" hx-trigger="recalc-totals from:body" hx-swap="outerHTML">
+    <div hx-get="/summary/${month}" hx-trigger="recalc-totals from:body" hx-swap="outerHTML">
         <h2>Total to allocate</h2>
         <h3>${totalToAllocate.toFixed(2)}</h3>
         <h2>Allocated</h2>

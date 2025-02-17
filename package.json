@@ -13,8 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.21.2",
-    "lodash": "^4.17.21",
-    "postgres": "^3.4.5"
+    "lodash": "^4.17.21"
   },
   "type": "module"
 }

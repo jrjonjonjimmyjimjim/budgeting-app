@@ -100,7 +100,7 @@ app.delete('/income/:incomeItem', async (req, res) => {
         WHERE
             key = ?
     `);
-    const income_item = income_itemQuery(incomeItem)
+    const income_item = income_itemQuery.get(incomeItem)
     // TODO: Find existing expenses that were pointing to this income item and... reassign them?
     const income_itemDelete = database.prepare(`
         DELETE FROM income_item

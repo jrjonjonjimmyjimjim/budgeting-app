@@ -20,6 +20,7 @@ async function createRootTemplate ({ month }) {
                     ${await createIncomeTableTemplate({ month })}
                     <hr>
                     ${await createSpendTablesTemplate({ month })}
+                    <h2 hx-get="/new_spend_table/${month}/" hx-swap="beforebegin">New Category</h2>
                 </div>
                 <div class="col-4">
                     ${await createSummaryTemplate({ month })}

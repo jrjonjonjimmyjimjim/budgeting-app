@@ -61,15 +61,15 @@ async function createRolloverTableTemplate ({ month }) {
             if (!spendItem.is_tracked) {
                 return 0;
             }
-            return Number(spendItem.amount);
+            return spendItem.amount;
         });
         const expensesForCategory = _.filter(expenses, (expense) =>
             _.some(spendItems, (spendItem) => spendItem.name === expense.spend_item)
         );
-        const expensesAmount = _.sumBy(expensesForCategory, (expenseForCategory) => Number(expenseForCategory.amount));
+        const expensesAmount = _.sumBy(expensesForCategory, 'amount');
         return {
             category,
-            amount: (categoryStartAmount - expensesAmount).toFixed(2),
+            amount: categoryStartAmount - expensesAmount,
         };
     });
     
@@ -89,7 +89,7 @@ async function createRolloverTableTemplate ({ month }) {
                         /*html*/`
                             <tr>
                                 <td>${rolloverLine.category}</td>
-                                <td>${rolloverLine.amount}</td>
+                                <td>${rolloverLine.amount.toFixed(2)}</td>
                             </tr>
                         `
                     )
@@ -98,7 +98,7 @@ async function createRolloverTableTemplate ({ month }) {
             }
             <tr class="total-line">
                 <td>TOTAL</td>
-                <td>${(_.sumBy(rolloverLines, (rolloverLine) => Number(rolloverLine.amount))).toFixed(2)}</td>
+                <td>${(_.sumBy(rolloverLines, 'amount')).toFixed(2)}</td>
             </tr>
         </tbody>
     </table>

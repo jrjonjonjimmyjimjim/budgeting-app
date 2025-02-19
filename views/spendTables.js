@@ -35,13 +35,13 @@ async function createSpendTablesTemplate ({ month }) {
     const spendCategories = _.map(spendItemsByCategory, (spendItems, category) => {
         const items = _.map(spendItems, (spendItem) => {
             const expensesForSpendItem = expensesBySpendItem[spendItem.name];
-            const totalExpensesForSpendItem = _.sumBy(expensesForSpendItem, (expenseForSpendItem) => Number(expenseForSpendItem.amount));
+            const totalExpensesForSpendItem = _.sumBy(expensesForSpendItem, 'amount');
             return {
                 key: spendItem.key,
                 name: spendItem.name,
                 amount: spendItem.amount,
-                spent: totalExpensesForSpendItem.toFixed(2),
-                remain: (Number(spendItem.amount) - totalExpensesForSpendItem).toFixed(2),
+                spent: totalExpensesForSpendItem,
+                remain: spendItem.amount - totalExpensesForSpendItem,
             };
         });
         return {
@@ -74,9 +74,9 @@ async function createSpendTablesTemplate ({ month }) {
                                         /*html*/`
                                             <tr>
                                                 <td>${item.name}</td>
-                                                <td>${item.amount}</td>
-                                                <td>${item.spent}</td>
-                                                <td>${item.remain}</td>
+                                                <td>${item.amount.toFixed(2)}</td>
+                                                <td>${item.spent.toFixed(2)}</td>
+                                                <td>${item.remain.toFixed(2)}</td>
                                                 <td hx-get="/spend/${item.key}/" hx-target="closest tr" hx-swap="outerHTML">Edit</td>
                                             </tr>
                                         `
@@ -86,9 +86,9 @@ async function createSpendTablesTemplate ({ month }) {
                             }
                             <tr class="total-line">
                                 <td>TOTAL</td>
-                                <td>${(_.sumBy(spendCategory.items, (item) => Number(item.amount))).toFixed(2)}</td>
-                                <td>${(_.sumBy(spendCategory.items, (item) => Number(item.spent))).toFixed(2)}</td>
-                                <td>${(_.sumBy(spendCategory.items, (item) => Number(item.remain))).toFixed(2)}</td>
+                                <td>${(_.sumBy(spendCategory.items, 'amount')).toFixed(2)}</td>
+                                <td>${(_.sumBy(spendCategory.items, 'spent')).toFixed(2)}</td>
+                                <td>${(_.sumBy(spendCategory.items, 'remain')).toFixed(2)}</td>
                                 <td hx-get="/spend/new_item/${month}/${spendCategory.category}" hx-target="closest tr" hx-swap="beforebegin">New</td>
                             </tr>
                         </tbody>

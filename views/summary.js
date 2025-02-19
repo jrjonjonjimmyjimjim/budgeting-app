@@ -89,12 +89,12 @@ async function createSummaryTemplate ({ month }) {
             if (!spendItem.is_tracked) {
                 return 0;
             }
-            return Number(spendItem.amount);
+            return spendItem.amount;
         });
         const expensesForCategory = _.filter(prevMonthExpenses, (expense) =>
             _.some(spendItems, (spendItem) => spendItem.name === expense.spend_item)
         );
-        const expensesAmount = _.sumBy(expensesForCategory, (expenseForCategory) => Number(expenseForCategory.amount));
+        const expensesAmount = _.sumBy(expensesForCategory, 'amount');
         return {
             category,
             amount: (categoryStartAmount - expensesAmount).toFixed(2),
@@ -104,8 +104,8 @@ async function createSummaryTemplate ({ month }) {
     //
     //    
 
-    const totalToAllocate = _.sumBy(incomeItems, (item) => Number(item.amount)) + _.sumBy(rolloverLines, (line) => Number(line.amount));
-    const totalAllocated = _.sumBy(spendItems, (item) => Number(item.amount));
+    const totalToAllocate = _.sumBy(incomeItems, 'amount') + _.sumBy(rolloverLines, 'amount');
+    const totalAllocated = _.sumBy(spendItems, 'amount');
 
     return /*html*/`
     <div hx-get="/summary/${month}" hx-trigger="recalc-totals from:body" hx-swap="outerHTML">

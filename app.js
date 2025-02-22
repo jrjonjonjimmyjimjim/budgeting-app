@@ -8,6 +8,7 @@ import createIncomeTableTemplate from './views/incomeTable.js';
 import createNewSpendTableTemplate from './views/newSpendTable.js';
 import createSpendTableTemplate from './views/spendTable.js';
 import createSpendItemTemplate from './views/spendItem.js';
+import createNewSpendItemTemplate from './views/newSpendItem.js';
 
 const app = express();
 app.use(express.urlencoded({ extended: false }));
@@ -49,7 +50,6 @@ app.get('/new_spend_table/:month', async (req, res) => {
 });
 
 app.get('/spend/new_item/:month/:category', async (req, res) => {
-    // TODO: This still isn't done
     const { month, category } = req.params;
     res.send(createNewSpendItemTemplate({ month, category }));
 });
@@ -73,6 +73,20 @@ app.post('/income/new_item/:month', async (req, res) => {
     res.send(await createIncomeTableTemplate({ month }));
 });
 
+app.post('/spend/new_item/:month/:category/', async (req, res) => {
+    const { month, category } = req.params;
+    const { item_name, item_amount } = req.body;
+
+    const spend_itemInsert = database.prepare(`
+        INSERT INTO spend_item (name, amount, month, category, is_tracked)
+        VALUES (?, ?, ?, ?, ?)
+    `);
+    spend_itemInsert.run(item_name, item_amount, month, category, 1);
+
+    res.set('HX-Trigger', 'recalc-totals');
+    res.send(await createSpendTableTemplate({ month, category }));
+});
+
 app.post('/new_spend_table/:month', async (req, res) => {
     const { month } = req.params;
     const { category_name } = req.body;
@@ -81,7 +95,7 @@ app.post('/new_spend_table/:month', async (req, res) => {
         INSERT INTO spend_item (name, amount, month, category, is_tracked)
         VALUES (?, ?, ?, ?, ?)
     `);
-    spend_itemInsert.run('New Item', 0, month, category_name, 0);
+    spend_itemInsert.run('New Item', 0, month, category_name, 1);
 
     res.send(await createSpendTableTemplate({ month, category: category_name }));
 });

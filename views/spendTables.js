@@ -16,6 +16,8 @@ async function createSpendTablesTemplate ({ month }) {
         ORDER BY name
     `);
     const spendItemsRaw = spendItemsRawQuery.all(month);
+    // Let it be known that I find this IN clause construction disgusting
+    const spendItemsFilter = `(${_.map(spendItemsRaw, 'key')})`;
     const expensesQuery = database.prepare(`
         SELECT
             name,
@@ -25,16 +27,16 @@ async function createSpendTablesTemplate ({ month }) {
         FROM
             expense
         WHERE
-            month = ?
-        ORDER BY name
+            spend_item IN ${spendItemsFilter}
+        ORDER BY date
     `);
-    const expenses = expensesQuery.all(month);
+    const expenses = expensesQuery.all();
 
     const spendItemsByCategory = _.groupBy(spendItemsRaw, 'category');
     const expensesBySpendItem = _.groupBy(expenses, 'spend_item');
     const spendCategories = _.map(spendItemsByCategory, (spendItems, category) => {
         const items = _.map(spendItems, (spendItem) => {
-            const expensesForSpendItem = expensesBySpendItem[spendItem.name];
+            const expensesForSpendItem = expensesBySpendItem[spendItem.key];
             const totalExpensesForSpendItem = _.sumBy(expensesForSpendItem, 'amount');
             return {
                 key: spendItem.key,
@@ -73,7 +75,7 @@ async function createSpendTablesTemplate ({ month }) {
                                     .map((item) =>
                                         /*html*/`
                                             <tr>
-                                                <td>${item.name}</td>
+                                                <td hx-get="/spend/${item.key}/expense/" hx-target="#expense-table" hx-swap="outerHTML">${item.name}</td>
                                                 <td>${item.amount.toFixed(2)}</td>
                                                 <td>${item.spent.toFixed(2)}</td>
                                                 <td>${item.remain.toFixed(2)}</td>

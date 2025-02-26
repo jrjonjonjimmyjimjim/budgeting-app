@@ -24,7 +24,7 @@ async function createSpendItemTemplate({ spendItem }) {
             expense
         WHERE
             spend_item = ?
-        ORDER BY name
+        ORDER BY date
     `);
     const expenses = expensesQuery.all(spendItem);
 

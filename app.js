@@ -9,7 +9,10 @@ import createNewSpendTableTemplate from './views/newSpendTable.js';
 import createSpendTableTemplate from './views/spendTable.js';
 import createSpendItemTemplate from './views/spendItem.js';
 import createNewSpendItemTemplate from './views/newSpendItem.js';
+import createExpenseTableTemplate from './views/expenseTable.js';
+import createNewExpenseItemTemplate from './views/newExpenseItem.js';
 
+// TODO: remove all async await
 const app = express();
 app.use(express.urlencoded({ extended: false }));
 
@@ -59,6 +62,16 @@ app.get('/spend/:spend_item', async (req, res) => {
     res.send(await createSpendItemTemplate({ spendItem: spend_item }));
 });
 
+app.get('/spend/:spend_item/expense', async (req, res) => {
+    const { spend_item } = req.params;
+    res.send(await createExpenseTableTemplate({ spendItem: spend_item }));
+});
+
+app.get('/expense/new_item/:spend_item', async (req, res) => {
+    const { spend_item } = req.params;
+    res.send(await createNewExpenseItemTemplate({ spendItem: spend_item }));
+});
+
 app.post('/income/new_item/:month', async (req, res) => {
     const { month } = req.params;
     const { item_name, item_amount } = req.body;
@@ -98,6 +111,19 @@ app.post('/new_spend_table/:month', async (req, res) => {
     spend_itemInsert.run('New Item', 0, month, category_name, 1);
 
     res.send(await createSpendTableTemplate({ month, category: category_name }));
+});
+
+app.post('/expense/new_item/:spend_item/', async (req, res) => {
+    const { spend_item } = req.params;
+    const { item_name, item_amount, item_date } = req.body;
+
+    const expenseInsert = database.prepare(`
+        INSERT INTO expense (name, amount, date, spend_item)
+        VALUES (?, ?, ?, ?)
+    `);
+    expenseInsert.run(item_name, item_amount, item_date, spend_item);
+
+    res.send(await createExpenseTableTemplate({ spendItem: spend_item }));
 });
 
 app.put('/income/:incomeItem', async (req, res) => {

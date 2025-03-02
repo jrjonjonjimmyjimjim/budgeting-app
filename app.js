@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import express from 'express';
 import database from './database.js';
 import createRootTemplate from './views/root.js';
@@ -70,6 +71,51 @@ app.get('/spend/:spend_item/expense', async (req, res) => {
 app.get('/expense/new_item/:spend_item', async (req, res) => {
     const { spend_item } = req.params;
     res.send(await createNewExpenseItemTemplate({ spendItem: spend_item }));
+});
+
+app.get('/copy/:previous_month/:month/', async (req, res) => {
+    const { previous_month, month } = req.params;
+
+    const prevMonthIncomeItemsQuery = database.prepare(`
+        SELECT
+            name,
+            amount
+        FROM
+            income_item
+        WHERE
+            month = ?
+        ORDER BY name
+    `);
+    const prevMonthIncomeItems = prevMonthIncomeItemsQuery.all(previous_month);
+    _.forEach(prevMonthIncomeItems, (prevMonthIncomeItem) => {
+        const income_itemInsert = database.prepare(`
+            INSERT INTO income_item (name, amount, month)
+            VALUES (?, ?, ?)
+        `);
+        income_itemInsert.run(prevMonthIncomeItem.name, prevMonthIncomeItem.amount, month);
+    });
+    const prevMonthSpendItemsQuery = database.prepare(`
+        SELECT
+            name,
+            amount,
+            category,
+            is_tracked
+        FROM
+            spend_item
+        WHERE
+            month = ?
+        ORDER BY name
+    `);
+    const prevMonthSpendItems = prevMonthSpendItemsQuery.all(previous_month);
+    _.forEach(prevMonthSpendItems, (prevMonthSpendItem) => {
+        const spend_itemInsert = database.prepare(`
+            INSERT INTO spend_item (name, amount, month, category, is_tracked)
+            VALUES (?, ?, ?, ?, ?)
+        `);
+        spend_itemInsert.run(prevMonthSpendItem.name, prevMonthSpendItem.amount, month, prevMonthSpendItem.category, 1);
+    });
+
+    res.redirect('/');
 });
 
 app.post('/income/new_item/:month', async (req, res) => {

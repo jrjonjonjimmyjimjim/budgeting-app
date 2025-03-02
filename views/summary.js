@@ -97,7 +97,7 @@ async function createSummaryTemplate ({ month }) {
         const expensesAmount = _.sumBy(expensesForCategory, 'amount');
         return {
             category,
-            amount: (categoryStartAmount - expensesAmount).toFixed(2),
+            amount: categoryStartAmount - expensesAmount,
         };
     });
     //
@@ -115,6 +115,11 @@ async function createSummaryTemplate ({ month }) {
         <h3>${totalAllocated.toFixed(2)}</h3>
         <h2>Remain to allocate</h2>
         <h3>${(totalToAllocate - totalAllocated).toFixed(2)}</h3>
+        ${
+            _.size(spendItems) === 0
+            ? `<a href="/copy/${_calculatePreviousMonth({ month })}/${month}/">Copy previous month</a>`
+            : ``
+        }
     </div>
     `;
 }

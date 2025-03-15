@@ -48,7 +48,7 @@ function createRootTemplate ({ month }) {
         <link href="/css/style.css" rel="stylesheet">
     </head>
     <body>
-        <div class="container">
+        <div id="main-container" class="container">
             <div class="row">
             <h1><a href="/month/${_calculateOtherMonth({ month, difference: -1 })}">&lt;</a> ${_calculateMonthString({ month })} <a href="/month/${_calculateOtherMonth({ month, difference: 1 })}">&gt;</a></h1>
             </div>
@@ -60,9 +60,11 @@ function createRootTemplate ({ month }) {
                     ${createSpendTablesTemplate({ month })}
                     <h2 class="btn btn-light" hx-get="/new_spend_table/${month}/" hx-swap="beforebegin">New Category</h2>
                 </div>
-                <div class="col-5 vstack gap-3">
-                    ${createSummaryTemplate({ month })}
-                    ${createExpensesTemplate({ month, spendItem: null })}
+                <div class="col-5">
+                    <div id="floating-sidebar" class="vstack gap-3">
+                        ${createSummaryTemplate({ month })}
+                        ${createExpensesTemplate({ month, spendItem: null })}
+                    </div>
                 </div>
             </div>
         </div>

@@ -113,12 +113,32 @@ function createSummaryTemplate ({ month }) {
             <h1>Summary</h1>
         </div>
         <div class="card-body">
-            <h2>Total to allocate</h2>
-            <h3>${totalToAllocate.toFixed(2)}</h3>
-            <h2>Allocated</h2>
-            <h3>${totalAllocated.toFixed(2)}</h3>
-            <h2>Remain to allocate</h2>
-            <h3>${(totalToAllocate - totalAllocated).toFixed(2)}</h3>
+            <div class="container">
+                <div class="row">
+                    <div class="col-7">
+                        <h2>Total to allocate</h2>
+                    </div>
+                    <div class="col-5">
+                        <h4 class="text-end">${totalToAllocate.toFixed(2)}</h4>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-7">
+                        <h2>Allocated</h2>
+                    </div>
+                    <div class="col-5">
+                        <h4 class="text-end">${totalAllocated.toFixed(2)}</h4>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-7">
+                        <h2>Remain to allocate</h2>
+                    </div>
+                    <div class="col-5">
+                        <h4 class="text-end">${(totalToAllocate - totalAllocated).toFixed(2)}</h4>
+                    </div>
+                </div>
+            </div>
             ${
                 _.size(spendItems) === 0
                 ? `<a href="/copy/${_calculatePreviousMonth({ month })}/${month}/">Copy previous month</a>`

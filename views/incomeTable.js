@@ -16,7 +16,7 @@ function createIncomeTableTemplate ({ month }) {
     const items = itemsQuery.all(month);
 
     return /*html*/`
-    <div class="card bg-income">
+    <div id="income-table" class="card bg-income">
         <div class="card-header">
             <h2>Income</h2>
         </div>

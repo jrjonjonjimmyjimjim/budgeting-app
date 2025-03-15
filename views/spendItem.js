@@ -6,7 +6,8 @@ function createSpendItemTemplate({ spendItem }) {
         SELECT
             name,
             amount,
-            is_tracked
+            is_tracked,
+            category
         FROM
             spend_item
         WHERE
@@ -37,8 +38,8 @@ function createSpendItemTemplate({ spendItem }) {
         <td>${totalExpensesForSpendItem.toFixed(2)}</td>
         <td>${(item.amount - totalExpensesForSpendItem).toFixed(2)}</td>
         <td>
-            <span hx-put="/spend/${spendItem}/" hx-target="closest div" hx-swap="outerHTML" hx-include="#item-name, #item-amount">Save</span>
-            | <span hx-delete="/spend/${spendItem}/" hx-target="closest div" hx-swap="outerHTML">Delete</span>
+            <span hx-put="/spend/${spendItem}/" hx-target="#spend-${item.category}" hx-swap="outerHTML" hx-include="#item-name, #item-amount">Save</span>
+            | <span hx-delete="/spend/${spendItem}/" hx-target="#spend-${item.category}" hx-swap="outerHTML">Delete</span>
         </td>
     </tr>
     `

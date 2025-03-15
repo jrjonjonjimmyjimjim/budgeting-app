@@ -8,7 +8,7 @@ function createNewSpendItemTemplate({ month, category }) {
         <td>---</td>
         <td>---</td>
         <td>
-            <span hx-post="/spend/new_item/${month}/${category}/" hx-target="closest div" hx-swap="outerHTML" hx-include="#item-name, #item-amount">Save</span>
+            <span hx-post="/spend/new_item/${month}/${category}/" hx-target="#spend-${category}" hx-swap="outerHTML" hx-include="#item-name, #item-amount">Save</span>
         </td>
     </tr>
     `

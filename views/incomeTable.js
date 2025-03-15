@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import database from '../database.js';
 
-async function createIncomeTableTemplate ({ month }) {
+function createIncomeTableTemplate ({ month }) {
     const itemsQuery = database.prepare(`
         SELECT
             key,

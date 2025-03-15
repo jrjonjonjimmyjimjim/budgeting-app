@@ -12,14 +12,14 @@ import createSpendItemTemplate from './views/spendItem.js';
 import createNewSpendItemTemplate from './views/newSpendItem.js';
 import createExpenseTableTemplate from './views/expenseTable.js';
 import createNewExpenseItemTemplate from './views/newExpenseItem.js';
+import createExpenseItemTemplate from './views/expenseItem.js';
 
-// TODO: remove all async await
 const app = express();
 app.use(express.urlencoded({ extended: false }));
 
 app.use(express.static('public'));
 
-app.get('/', async (req, res) => {
+app.get('/', (req, res) => {
     const currentDate = new Date();
     const month = currentDate.getMonth() + 1;
 
@@ -30,51 +30,62 @@ app.get('/', async (req, res) => {
         monthString = `${month}`;
     }
     monthString = `${currentDate.getFullYear()}${monthString}`;
-    res.send(await createRootTemplate({ month: monthString }));
+    res.send(createRootTemplate({ month: monthString }));
 });
 
-app.get('/summary/:month', async (req, res) => {
+app.get('/month/:month', (req, res) => {
     const { month } = req.params;
-    res.send(await createSummaryTemplate({ month }));
+
+    res.send(createRootTemplate({ month }));
 });
 
-app.get('/income/new_item/:month', async (req, res) => {
+app.get('/summary/:month', (req, res) => {
+    const { month } = req.params;
+    res.send(createSummaryTemplate({ month }));
+});
+
+app.get('/income/new_item/:month', (req, res) => {
     const { month } = req.params;
     res.send(createNewIncomeItemTemplate({ month }));
 });
 
-app.get('/income/:incomeItem', async (req, res) => {
+app.get('/income/:incomeItem', (req, res) => {
     const { incomeItem } = req.params;
-    res.send(await createIncomeItemTemplate({ incomeItem }));
+    res.send(createIncomeItemTemplate({ incomeItem }));
 });
 
-app.get('/new_spend_table/:month', async (req, res) => {
+app.get('/new_spend_table/:month', (req, res) => {
     const { month } = req.params;
     res.send(createNewSpendTableTemplate({ month }));
 });
 
-app.get('/spend/new_item/:month/:category', async (req, res) => {
+app.get('/spend/new_item/:month/:category', (req, res) => {
     const { month, category } = req.params;
     res.send(createNewSpendItemTemplate({ month, category }));
 });
 
-app.get('/spend/:spend_item', async (req, res) => {
-    const { spend_item } = req.params;
-    res.send(await createSpendItemTemplate({ spendItem: spend_item }));
+app.get('/spend/:spendItem', (req, res) => {
+    const { spendItem } = req.params;
+    res.send(createSpendItemTemplate({ spendItem }));
 });
 
-app.get('/spend/:spend_item/expense', async (req, res) => {
-    const { spend_item } = req.params;
-    res.send(await createExpenseTableTemplate({ spendItem: spend_item }));
+app.get('/spend/:spendItem/expense', (req, res) => {
+    const { spendItem } = req.params;
+    res.send(createExpenseTableTemplate({ spendItem }));
 });
 
-app.get('/expense/new_item/:spend_item', async (req, res) => {
-    const { spend_item } = req.params;
-    res.send(await createNewExpenseItemTemplate({ spendItem: spend_item }));
+app.get('/expense/new_item/:spendItem', (req, res) => {
+    const { spendItem } = req.params;
+    res.send(createNewExpenseItemTemplate({ spendItem }));
 });
 
-app.get('/copy/:previous_month/:month/', async (req, res) => {
-    const { previous_month, month } = req.params;
+app.get('/expense/:expenseItem', (req, res) => {
+    const { expenseItem } = req.params;
+    res.send(createExpenseItemTemplate({ expenseItem }));
+});
+
+app.get('/copy/:previousMonth/:month/', (req, res) => {
+    const { previousMonth, month } = req.params;
 
     const prevMonthIncomeItemsQuery = database.prepare(`
         SELECT
@@ -86,7 +97,7 @@ app.get('/copy/:previous_month/:month/', async (req, res) => {
             month = ?
         ORDER BY name
     `);
-    const prevMonthIncomeItems = prevMonthIncomeItemsQuery.all(previous_month);
+    const prevMonthIncomeItems = prevMonthIncomeItemsQuery.all(previousMonth);
     _.forEach(prevMonthIncomeItems, (prevMonthIncomeItem) => {
         const income_itemInsert = database.prepare(`
             INSERT INTO income_item (name, amount, month)
@@ -106,7 +117,7 @@ app.get('/copy/:previous_month/:month/', async (req, res) => {
             month = ?
         ORDER BY name
     `);
-    const prevMonthSpendItems = prevMonthSpendItemsQuery.all(previous_month);
+    const prevMonthSpendItems = prevMonthSpendItemsQuery.all(previousMonth);
     _.forEach(prevMonthSpendItems, (prevMonthSpendItem) => {
         const spend_itemInsert = database.prepare(`
             INSERT INTO spend_item (name, amount, month, category, is_tracked)
@@ -118,7 +129,7 @@ app.get('/copy/:previous_month/:month/', async (req, res) => {
     res.redirect('/');
 });
 
-app.post('/income/new_item/:month', async (req, res) => {
+app.post('/income/new_item/:month', (req, res) => {
     const { month } = req.params;
     const { item_name, item_amount } = req.body;
 
@@ -129,10 +140,10 @@ app.post('/income/new_item/:month', async (req, res) => {
     income_itemInsert.run(item_name, item_amount, month);
 
     res.set('HX-Trigger', 'recalc-totals');
-    res.send(await createIncomeTableTemplate({ month }));
+    res.send(createIncomeTableTemplate({ month }));
 });
 
-app.post('/spend/new_item/:month/:category/', async (req, res) => {
+app.post('/spend/new_item/:month/:category/', (req, res) => {
     const { month, category } = req.params;
     const { item_name, item_amount } = req.body;
 
@@ -143,10 +154,10 @@ app.post('/spend/new_item/:month/:category/', async (req, res) => {
     spend_itemInsert.run(item_name, item_amount, month, category, 1);
 
     res.set('HX-Trigger', 'recalc-totals');
-    res.send(await createSpendTableTemplate({ month, category }));
+    res.send(createSpendTableTemplate({ month, category }));
 });
 
-app.post('/new_spend_table/:month', async (req, res) => {
+app.post('/new_spend_table/:month', (req, res) => {
     const { month } = req.params;
     const { category_name } = req.body;
 
@@ -156,23 +167,37 @@ app.post('/new_spend_table/:month', async (req, res) => {
     `);
     spend_itemInsert.run('New Item', 0, month, category_name, 1);
 
-    res.send(await createSpendTableTemplate({ month, category: category_name }));
+    res.send(createSpendTableTemplate({ month, category: category_name }));
 });
 
-app.post('/expense/new_item/:spend_item/', async (req, res) => {
-    const { spend_item } = req.params;
+app.post('/expense/new_item/:spendItem/', (req, res) => {
+    const { spendItem } = req.params;
     const { item_name, item_amount, item_date } = req.body;
+
+    const spendItemQuery = database.prepare(`
+        SELECT
+            spend_item.month month,
+            spend_item.category category
+        FROM
+            spend_item
+        WHERE
+            spend_item.key = ?
+    `);
+    const spendItemDetails = spendItemQuery.get(spendItem);
 
     const expenseInsert = database.prepare(`
         INSERT INTO expense (name, amount, date, spend_item)
         VALUES (?, ?, ?, ?)
     `);
-    expenseInsert.run(item_name, item_amount, item_date, spend_item);
+    expenseInsert.run(item_name, item_amount, item_date, spendItem);
 
-    res.send(await createExpenseTableTemplate({ spendItem: spend_item }));
+    res.send(`
+        ${createExpenseTableTemplate({ spendItem })}
+        ${createSpendTableTemplate({ month: spendItemDetails.month, category: spendItemDetails.category, outOfBand: true })}
+    `);
 });
 
-app.put('/income/:incomeItem', async (req, res) => {
+app.put('/income/:incomeItem', (req, res) => {
     const { incomeItem } = req.params;
     const { item_name, item_amount } = req.body;
 
@@ -194,10 +219,10 @@ app.put('/income/:incomeItem', async (req, res) => {
     income_itemUpdate.run(item_name, item_amount, incomeItem);
     
     res.set('HX-Trigger', 'recalc-totals');
-    res.send(await createIncomeTableTemplate({ month: income_item.month }));
+    res.send(createIncomeTableTemplate({ month: income_item.month }));
 });
 
-app.put('/spend/:spendItem', async (req, res) => {
+app.put('/spend/:spendItem', (req, res) => {
     const { spendItem } = req.params;
     const { item_name, item_amount } = req.body;
 
@@ -220,10 +245,40 @@ app.put('/spend/:spendItem', async (req, res) => {
     spend_itemUpdate.run(item_name, item_amount, spendItem);
     
     res.set('HX-Trigger', 'recalc-totals');
-    res.send(await createSpendTableTemplate({ month: spend_item.month, category: spend_item.category }));
+    res.send(createSpendTableTemplate({ month: spend_item.month, category: spend_item.category }));
 });
 
-app.delete('/income/:incomeItem', async (req, res) => {
+app.put('/expense/:expenseItem', (req, res) => {
+    const { expenseItem } = req.params;
+    const { item_name, item_amount, item_date } = req.body;
+
+    const expenseQuery = database.prepare(`
+        SELECT
+            spend_item.key spend_item,
+            spend_item.month month,
+            spend_item.category category
+        FROM
+            expense
+            INNER JOIN spend_item ON (expense.spend_item = spend_item.key)
+        WHERE
+            expense.key = ?
+    `);
+    const expense = expenseQuery.get(expenseItem);
+
+    const expenseUpdate = database.prepare(`
+        UPDATE expense
+        SET name = ?, amount = ?, date = ?
+        WHERE key = ?
+    `);
+    expenseUpdate.run(item_name, item_amount, item_date, expenseItem);
+    
+    res.send(`
+        ${createExpenseTableTemplate({ spendItem: expense.spend_item })}
+        ${createSpendTableTemplate({ month: expense.month, category: expense.category, outOfBand: true })}
+    `);
+});
+
+app.delete('/income/:incomeItem', (req, res) => {
     const { incomeItem } = req.params;
 
     const income_itemQuery = database.prepare(`
@@ -235,7 +290,7 @@ app.delete('/income/:incomeItem', async (req, res) => {
             key = ?
     `);
     const income_item = income_itemQuery.get(incomeItem)
-    // TODO: Find existing expenses that were pointing to this income item and... reassign them?
+
     const income_itemDelete = database.prepare(`
         DELETE FROM income_item
         WHERE key = ?
@@ -243,10 +298,10 @@ app.delete('/income/:incomeItem', async (req, res) => {
     income_itemDelete.run(incomeItem);
     
     res.set('HX-Trigger', 'recalc-totals');
-    res.send(await createIncomeTableTemplate({ month: income_item.month }));
+    res.send(createIncomeTableTemplate({ month: income_item.month }));
 });
 
-app.delete('/spend/:spendItem', async (req, res) => {
+app.delete('/spend/:spendItem', (req, res) => {
     const { spendItem } = req.params;
 
     const spend_itemQuery = database.prepare(`
@@ -259,7 +314,7 @@ app.delete('/spend/:spendItem', async (req, res) => {
             key = ?
     `);
     const spend_item = spend_itemQuery.get(spendItem)
-    // TODO: Find existing expenses that were pointing to this income item and... reassign them?
+    // TODO: Find existing expenses that were pointing to this spend item and... reassign them?
     const spend_itemDelete = database.prepare(`
         DELETE FROM spend_item
         WHERE key = ?
@@ -267,7 +322,35 @@ app.delete('/spend/:spendItem', async (req, res) => {
     spend_itemDelete.run(spendItem);
     
     res.set('HX-Trigger', 'recalc-totals');
-    res.send(await createSpendTableTemplate({ month: spend_item.month, category: spend_item.category }));
+    res.send(createSpendTableTemplate({ month: spend_item.month, category: spend_item.category }));
+});
+
+app.delete('/expense/:expenseItem', (req, res) => {
+    const { expenseItem } = req.params;
+
+    const expenseQuery = database.prepare(`
+        SELECT
+            spend_item.key spend_item,
+            spend_item.month month,
+            spend_item.category category
+        FROM
+            expense
+            INNER JOIN spend_item ON (expense.spend_item = spend_item.key)
+        WHERE
+            expense.key = ?
+    `);
+    const expense = expenseQuery.get(expenseItem);
+
+    const expenseDelete = database.prepare(`
+        DELETE FROM expense
+        WHERE key = ?
+    `);
+    expenseDelete.run(expenseItem);
+    
+    res.send(`
+        ${createExpenseTableTemplate({ spendItem: expense.spend_item })}
+        ${createSpendTableTemplate({ month: expense.month, category: expense.category, outOfBand: true })}
+    `);
 });
 
 app.listen(3000, () => {

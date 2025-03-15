@@ -22,7 +22,6 @@ database.exec(`
         key INTEGER PRIMARY KEY,
         name TEXT,
         amount REAL,
-        month INTEGER,
         date TEXT,
         spend_item INTEGER,
         FOREIGN KEY(spend_item) REFERENCES spend_item(key)

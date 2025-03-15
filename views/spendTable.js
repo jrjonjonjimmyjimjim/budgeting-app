@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import database from '../database.js';
 
-async function createSpendTableTemplate ({ month, category }) {
+function createSpendTableTemplate ({ month, category, outOfBand }) {
     const spendItemsQuery = database.prepare(`
         SELECT
             key,
@@ -51,7 +51,7 @@ async function createSpendTableTemplate ({ month, category }) {
 
 
     return /*html*/`
-        <div>
+        <div id="spend-${category}" ${outOfBand ? `hx-swap-oob="true"` : ``}>
         <h2>${category}</h2>
         <table class="table">
             <thead>

@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import database from '../database.js';
 
-async function createRolloverTableTemplate ({ month }) {
+function createRolloverTableTemplate ({ month }) {
 
     function _calculatePreviousMonth ({ month }) {
         const fullString = `${month}`;

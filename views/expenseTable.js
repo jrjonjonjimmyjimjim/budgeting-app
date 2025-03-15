@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import database from '../database.js';
 
-async function createExpenseTableTemplate ({ spendItem }) {
+function createExpenseTableTemplate ({ spendItem }) {
     if (!spendItem) {
         return /*html*/`
             <div id="expense-table" class="card">

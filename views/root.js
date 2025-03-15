@@ -11,7 +11,34 @@ function _calculateMonthString ({ month }) {
     return `${monthFinal}/${year}`;
 }
 
-async function createRootTemplate ({ month }) {
+function _calculateOtherMonth ({ month, difference }) {
+    const fullString = `${month}`;
+    const yearString = fullString.substring(0, 4);
+    const monthString = fullString.substring(4);
+    const yearInt = Number(yearString);
+    const monthInt = Number(monthString);
+    let otherMonthInt = monthInt + difference;
+    let otherYearInt = yearInt;
+
+    if (otherMonthInt <= 0) {
+        otherYearInt -= 1;
+        otherMonthInt = 12;
+    } else if (otherMonthInt >= 13) {
+        otherYearInt += 1;
+        otherMonthInt = 1;
+    }
+
+    let otherMonthString;
+    if (otherMonthInt < 10) {
+        otherMonthString = `0${otherMonthInt}`;
+    } else {
+        otherMonthString = `${otherMonthInt}`;
+    }
+
+    return Number(`${otherYearInt}${otherMonthString}`);
+}
+
+function createRootTemplate ({ month }) {
     return /*html*/`
     <html>
     <head>
@@ -20,19 +47,19 @@ async function createRootTemplate ({ month }) {
         <link href="/css/bootstrap.css" rel="stylesheet">
     </head>
     <body>
-        <h1>${_calculateMonthString({ month })}</h1>
+        <h1><a href="/month/${_calculateOtherMonth({ month, difference: -1 })}">&lt;</a> ${_calculateMonthString({ month })} <a href="/month/${_calculateOtherMonth({ month, difference: 1 })}">&gt;</a></h1>
         <div class="container">
             <div class="row">
                 <div class="col-8 vstack gap-3">
-                    ${await createRolloverTableTemplate({ month })}
-                    ${await createIncomeTableTemplate({ month })}
+                    ${ createRolloverTableTemplate({ month })}
+                    ${ createIncomeTableTemplate({ month })}
                     <hr>
-                    ${await createSpendTablesTemplate({ month })}
+                    ${ createSpendTablesTemplate({ month })}
                     <h2 hx-get="/new_spend_table/${month}/" hx-swap="beforebegin">New Category</h2>
                 </div>
                 <div class="col-4">
-                    ${await createSummaryTemplate({ month })}
-                    ${await createExpensesTemplate({ month, spendItem: null })}
+                    ${ createSummaryTemplate({ month })}
+                    ${ createExpensesTemplate({ month, spendItem: null })}
                 </div>
             </div>
         </div>

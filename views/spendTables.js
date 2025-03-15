@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import database from '../database.js';
 
-async function createSpendTablesTemplate ({ month }) {
+function createSpendTablesTemplate ({ month }) {
     const spendItemsRawQuery = database.prepare(`
         SELECT
             key,
@@ -57,7 +57,7 @@ async function createSpendTablesTemplate ({ month }) {
         _.chain(spendCategories)
             .map((spendCategory) =>
                 /*html*/`
-                    <div>
+                    <div id="spend-${spendCategory.category}">
                     <h2>${spendCategory.category}</h2>
                     <table class="table">
                         <thead>

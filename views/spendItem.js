@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import database from '../database.js';
 
-async function createSpendItemTemplate({ spendItem }) {
+function createSpendItemTemplate({ spendItem }) {
     const itemQuery = database.prepare(`
         SELECT
             name,

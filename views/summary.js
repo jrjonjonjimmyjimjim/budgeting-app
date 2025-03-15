@@ -108,18 +108,23 @@ function createSummaryTemplate ({ month }) {
     const totalAllocated = _.sumBy(spendItems, 'amount');
 
     return /*html*/`
-    <div hx-get="/summary/${month}" hx-trigger="recalc-totals from:body" hx-swap="outerHTML">
-        <h2>Total to allocate</h2>
-        <h3>${totalToAllocate.toFixed(2)}</h3>
-        <h2>Allocated</h2>
-        <h3>${totalAllocated.toFixed(2)}</h3>
-        <h2>Remain to allocate</h2>
-        <h3>${(totalToAllocate - totalAllocated).toFixed(2)}</h3>
-        ${
-            _.size(spendItems) === 0
-            ? `<a href="/copy/${_calculatePreviousMonth({ month })}/${month}/">Copy previous month</a>`
-            : ``
-        }
+    <div class="card bg-summary" hx-get="/summary/${month}" hx-trigger="recalc-totals from:body" hx-swap="outerHTML">
+        <div class="card-header">
+            <h1>Summary</h1>
+        </div>
+        <div class="card-body">
+            <h2>Total to allocate</h2>
+            <h3>${totalToAllocate.toFixed(2)}</h3>
+            <h2>Allocated</h2>
+            <h3>${totalAllocated.toFixed(2)}</h3>
+            <h2>Remain to allocate</h2>
+            <h3>${(totalToAllocate - totalAllocated).toFixed(2)}</h3>
+            ${
+                _.size(spendItems) === 0
+                ? `<a href="/copy/${_calculatePreviousMonth({ month })}/${month}/">Copy previous month</a>`
+                : ``
+            }
+        </div>
     </div>
     `;
 }

@@ -1,0 +1,52 @@
+body {
+    background-attachment: fixed;
+    background-size: cover;
+    background-position: center;
+    background-image: url('../assets/background.jpg');
+}
+
+.container {
+    background-color: rgba(255, 255, 255, 0.688);
+    border-radius: 1em;
+}
+
+.bg-summary > .card-header {
+    background-color: rgb(143, 143, 255);
+}
+
+.bg-summary > .card-body {
+    background-color: rgb(187, 187, 255);
+}
+
+.bg-income > .card-header {
+    background-color: rgb(130, 255, 130);
+}
+
+.bg-income > .card-body {
+    background-color: rgb(180, 253, 180);
+}
+
+.bg-spend > .card-header {
+    background-color: rgb(255, 114, 114);
+}
+
+.bg-spend > .card-body {
+    background-color: rgb(255, 169, 169);
+}
+
+.bg-expense > .card-header {
+    background-color: rgb(232, 232, 111);
+}
+
+.bg-expense > .card-body {
+    background-color: rgb(255, 255, 174);
+}
+
+.total-line {
+    font-weight: bold;
+}
+
+#expense-table {
+    top: 2em;
+    position: sticky;
+}

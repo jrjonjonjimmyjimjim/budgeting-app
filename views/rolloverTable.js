@@ -74,34 +74,40 @@ function createRolloverTableTemplate ({ month }) {
     });
     
     return /*html*/`
-    <h2>Rollover</h2>
-    <table class="table">
-        <thead>
-            <tr>
-                <th scope="col">Category</th>
-                <th scope="col">Amount</th>
-            </tr>
-        </thead>
-        <tbody>
-            ${
-                _.chain(rolloverLines)
-                    .map((rolloverLine) => 
-                        /*html*/`
-                            <tr>
-                                <td>${rolloverLine.category}</td>
-                                <td>${rolloverLine.amount.toFixed(2)}</td>
-                            </tr>
-                        `
-                    )
-                    .join('')
-                    .value()
-            }
-            <tr class="total-line">
-                <td>TOTAL</td>
-                <td>${(_.sumBy(rolloverLines, 'amount')).toFixed(2)}</td>
-            </tr>
-        </tbody>
-    </table>
+    <div class="card bg-income">
+        <div class="card-header">
+            <h2>Rollover</h2>
+        </div>
+        <div class="card-body">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">Category</th>
+                        <th scope="col">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${
+                        _.chain(rolloverLines)
+                            .map((rolloverLine) => 
+                                /*html*/`
+                                    <tr>
+                                        <td>${rolloverLine.category}</td>
+                                        <td>${rolloverLine.amount.toFixed(2)}</td>
+                                    </tr>
+                                `
+                            )
+                            .join('')
+                            .value()
+                    }
+                    <tr class="total-line">
+                        <td>TOTAL</td>
+                        <td>${(_.sumBy(rolloverLines, 'amount')).toFixed(2)}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
     `;
 }
 

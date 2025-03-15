@@ -57,44 +57,48 @@ function createSpendTablesTemplate ({ month }) {
         _.chain(spendCategories)
             .map((spendCategory) =>
                 /*html*/`
-                    <div id="spend-${spendCategory.category}">
-                    <h2>${spendCategory.category}</h2>
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th scope="col">Name</th>
-                                <th scope="col">Amount</th>
-                                <th scope="col">Spent</th>
-                                <th scope="col">Remain</th>
-                                <th scope="col">Edit</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${
-                                _.chain(spendCategory.items)
-                                    .map((item) =>
-                                        /*html*/`
-                                            <tr>
-                                                <td hx-get="/spend/${item.key}/expense/" hx-target="#expense-table" hx-swap="outerHTML">${item.name}</td>
-                                                <td>${item.amount.toFixed(2)}</td>
-                                                <td>${item.spent.toFixed(2)}</td>
-                                                <td>${item.remain.toFixed(2)}</td>
-                                                <td hx-get="/spend/${item.key}/" hx-target="closest tr" hx-swap="outerHTML">Edit</td>
-                                            </tr>
-                                        `
-                                    )
-                                    .join('')
-                                    .value()
-                            }
-                            <tr class="total-line">
-                                <td>TOTAL</td>
-                                <td>${(_.sumBy(spendCategory.items, 'amount')).toFixed(2)}</td>
-                                <td>${(_.sumBy(spendCategory.items, 'spent')).toFixed(2)}</td>
-                                <td>${(_.sumBy(spendCategory.items, 'remain')).toFixed(2)}</td>
-                                <td hx-get="/spend/new_item/${month}/${spendCategory.category}" hx-target="closest tr" hx-swap="beforebegin">New</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div id="spend-${spendCategory.category}" class="card bg-spend">
+                        <div class="card-header">
+                            <h2>${spendCategory.category}</h2>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Name</th>
+                                        <th scope="col">Amount</th>
+                                        <th scope="col">Spent</th>
+                                        <th scope="col">Remain</th>
+                                        <th scope="col">Edit</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${
+                                        _.chain(spendCategory.items)
+                                            .map((item) =>
+                                                /*html*/`
+                                                    <tr>
+                                                        <td hx-get="/spend/${item.key}/expense/" hx-target="#expense-table" hx-swap="outerHTML">${item.name}</td>
+                                                        <td>${item.amount.toFixed(2)}</td>
+                                                        <td>${item.spent.toFixed(2)}</td>
+                                                        <td>${item.remain.toFixed(2)}</td>
+                                                        <td hx-get="/spend/${item.key}/" hx-target="closest tr" hx-swap="outerHTML">Edit</td>
+                                                    </tr>
+                                                `
+                                            )
+                                            .join('')
+                                            .value()
+                                    }
+                                    <tr class="total-line">
+                                        <td>TOTAL</td>
+                                        <td>${(_.sumBy(spendCategory.items, 'amount')).toFixed(2)}</td>
+                                        <td>${(_.sumBy(spendCategory.items, 'spent')).toFixed(2)}</td>
+                                        <td>${(_.sumBy(spendCategory.items, 'remain')).toFixed(2)}</td>
+                                        <td hx-get="/spend/new_item/${month}/${spendCategory.category}" hx-target="closest tr" hx-swap="beforebegin">New</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 `
             )

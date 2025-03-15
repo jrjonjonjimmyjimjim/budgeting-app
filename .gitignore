@@ -149,3 +149,4 @@ dist
 # Project-specific
 config.json
 database.db
+sqlite3

@@ -4,7 +4,7 @@ import database from '../database.js';
 function createExpenseTableTemplate ({ spendItem }) {
     if (!spendItem) {
         return /*html*/`
-            <div id="expense-table" class="card">
+            <div id="expense-table" class="card bg-expense">
                 <div class="card-header">
                     <h4>Select Spend Item to Track Expense</h4>
                 </div>
@@ -38,12 +38,12 @@ function createExpenseTableTemplate ({ spendItem }) {
     const expenses = expensesQuery.all(spendItem);
 
     return /*html*/`
-        <div id="expense-table" class="card">
+        <div id="expense-table" class="card bg-expense">
             <div class="card-header">
                 <h2>Expenses for ${spend_item.name}</h2>
             </div>
             <div class="card-body">
-                <table class="table">
+                <table class="table table-striped">
                 <thead>
                     <tr>
                         <th scope="col">Vendor</th>
@@ -68,7 +68,7 @@ function createExpenseTableTemplate ({ spendItem }) {
                             .join('')
                             .value()
                     }
-                    <tr>
+                    <tr class="total-line">
                         <td>---</td>
                         <td>${(_.sumBy(expenses, 'amount')).toFixed(2)}</td>
                         <td>---</td>

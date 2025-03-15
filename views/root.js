@@ -45,21 +45,24 @@ function createRootTemplate ({ month }) {
         <script src="/js/bootstrap.js" defer></script>
         <script src="/js/htmx.min.js" defer></script>
         <link href="/css/bootstrap.css" rel="stylesheet">
+        <link href="/css/style.css" rel="stylesheet">
     </head>
     <body>
-        <h1><a href="/month/${_calculateOtherMonth({ month, difference: -1 })}">&lt;</a> ${_calculateMonthString({ month })} <a href="/month/${_calculateOtherMonth({ month, difference: 1 })}">&gt;</a></h1>
         <div class="container">
             <div class="row">
-                <div class="col-8 vstack gap-3">
-                    ${ createRolloverTableTemplate({ month })}
-                    ${ createIncomeTableTemplate({ month })}
+            <h1><a href="/month/${_calculateOtherMonth({ month, difference: -1 })}">&lt;</a> ${_calculateMonthString({ month })} <a href="/month/${_calculateOtherMonth({ month, difference: 1 })}">&gt;</a></h1>
+            </div>
+            <div class="row">
+                <div class="col-7 vstack gap-3">
+                    ${createRolloverTableTemplate({ month })}
+                    ${createIncomeTableTemplate({ month })}
                     <hr>
-                    ${ createSpendTablesTemplate({ month })}
-                    <h2 hx-get="/new_spend_table/${month}/" hx-swap="beforebegin">New Category</h2>
+                    ${createSpendTablesTemplate({ month })}
+                    <h2 class="btn btn-light" hx-get="/new_spend_table/${month}/" hx-swap="beforebegin">New Category</h2>
                 </div>
-                <div class="col-4">
-                    ${ createSummaryTemplate({ month })}
-                    ${ createExpensesTemplate({ month, spendItem: null })}
+                <div class="col-5 vstack gap-3">
+                    ${createSummaryTemplate({ month })}
+                    ${createExpensesTemplate({ month, spendItem: null })}
                 </div>
             </div>
         </div>

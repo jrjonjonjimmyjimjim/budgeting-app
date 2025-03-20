@@ -33,8 +33,8 @@ function createSpendItemTemplate({ spendItem }) {
 
     return /*html*/`
     <tr>
-        <td><input id="item-name" name="item_name" type="text" value="${item.name}"></input></td>
-        <td><input id="item-amount" name="item_amount" type="text" value="${item.amount.toFixed(2)}"></input></td>
+        <td><input id="item-name" name="item_name" type="text" size="10" value="${item.name}"></input></td>
+        <td><input id="item-amount" name="item_amount" type="text" size="8" value="${item.amount.toFixed(2)}"></input></td>
         <td>${totalExpensesForSpendItem.toFixed(2)}</td>
         <td>${(item.amount - totalExpensesForSpendItem).toFixed(2)}</td>
         <td>

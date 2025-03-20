@@ -14,7 +14,8 @@ function createExpenseTableTemplate ({ spendItem }) {
 
     const spend_itemQuery = database.prepare(`
         SELECT
-            name
+            name,
+            is_tracked
         FROM
             spend_item
         WHERE
@@ -43,6 +44,7 @@ function createExpenseTableTemplate ({ spendItem }) {
                 <h2>Expenses for ${spend_item.name}</h2>
             </div>
             <div class="card-body">
+                <input hx-put="/expense/${expense.key}/tracked/" id="is-tracked" name="is_tracked" type="checkbox" ${spend_item.is_tracked ? `checked` : ``}></input>
                 <table class="table table-striped">
                 <thead>
                     <tr>

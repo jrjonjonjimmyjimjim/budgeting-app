@@ -248,6 +248,33 @@ app.put('/spend/:spendItem', (req, res) => {
     res.send(createSpendTableTemplate({ month: spend_item.month, category: spend_item.category }));
 });
 
+app.put('/spend/:spendItem/tracked', (req, res) => {
+    const { spendItem } = req.params;
+    const { is_tracked } = req.body;
+    console.log(is_tracked);
+
+    const spend_itemQuery = database.prepare(`
+        SELECT
+            month,
+            category
+        FROM
+            spend_item
+        WHERE
+            key = ?
+    `);
+    const spend_item = spend_itemQuery.get(spendItem);
+
+    const spend_itemUpdate = database.prepare(`
+        UPDATE spend_item
+        SET is_tracked = ?
+        WHERE key = ?
+    `);
+    spend_itemUpdate.run(is_tracked === 'on' ? 1 : 0, spendItem);
+    
+    res.set('HX-Trigger', 'recalc-totals');
+    res.send(createSpendTableTemplate({ month: spend_item.month, category: spend_item.category }));
+});
+
 app.put('/expense/:expenseItem', (req, res) => {
     const { expenseItem } = req.params;
     const { item_name, item_amount, item_date } = req.body;

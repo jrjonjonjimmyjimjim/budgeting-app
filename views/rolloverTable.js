@@ -43,14 +43,15 @@ function createRolloverTableTemplate ({ month }) {
     const spendItemsRaw = spendItemsRawQuery.all(previousMonth);
     const expensesQuery = database.prepare(`
         SELECT
-            name,
-            amount,
-            date,
-            spend_item
+            expense.name name,
+            expense.amount amount,
+            expense.date date,
+            expense.spend_item spend_item
         FROM
             expense
+            INNER JOIN spend_item ON (expense.spend_item = spend_item.key)
         WHERE
-            month = ?
+            spend_item.month = ?
         ORDER BY name
     `);
     const expenses = expensesQuery.all(previousMonth);

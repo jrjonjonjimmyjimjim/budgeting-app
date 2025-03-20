@@ -70,14 +70,15 @@ function createSummaryTemplate ({ month }) {
     const prevMonthSpendItemsRaw = prevMonthSpendItemsRawQuery.all(previousMonth);
     const prevMonthExpensesQuery = database.prepare(`
         SELECT
-            name,
-            amount,
-            date,
-            spend_item
+            expense.name name,
+            expense.amount amount,
+            expense.date date,
+            expense.spend_item spend_item
         FROM
             expense
+            INNER JOIN spend_item ON (expense.spend_item = spend_item.key)
         WHERE
-            month = ?
+            spend_item.month = ?
         ORDER BY name
     `);
     const prevMonthExpenses = prevMonthExpensesQuery.all(previousMonth);

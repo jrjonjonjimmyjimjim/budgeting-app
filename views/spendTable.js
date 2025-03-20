@@ -39,7 +39,7 @@ function createSpendTableTemplate ({ month, category, outOfBand }) {
     const expensesBySpendItem = _.groupBy(expenses, 'spend_item');
     const items = _.map(spendItems, (spendItem) => {
         const expensesForSpendItem = expensesBySpendItem[spendItem.key];
-        const totalExpensesForSpendItem = _.sumBy(expensesForSpendItem, 'amount');
+        const totalExpensesForSpendItem = spendItem.is_tracked ? _.sumBy(expensesForSpendItem, 'amount') : spendItem.amount;
         return {
             key: spendItem.key,
             name: spendItem.name,

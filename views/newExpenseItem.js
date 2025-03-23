@@ -6,7 +6,7 @@ function createNewExpenseItemTemplate ({ spendItem }) {
     return /*html*/`
         <tr>
             <td><input id="item-name" name="item_name" type="text" size="10" value=""></input></td>
-            <td><input id="item-amount" name="item_amount" type="text" size="8" value=""></input></td>
+            <td><input id="item-amount" name="item_amount" type="text" inputmode="decimal" size="8" value=""></input></td>
             <td><input id="item-date" name="item_date" type="date" value="${todayDateString}"></input></td>
             <td>
                 <span hx-post="/expense/new_item/${spendItem}/" hx-target="#expense-table" hx-swap="outerHTML" hx-include="#item-name, #item-amount, #item-date">Save</span>

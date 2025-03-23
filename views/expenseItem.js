@@ -17,7 +17,7 @@ function createExpenseItemTemplate ({ expenseItem }) {
     return /*html*/`
         <tr>
             <td><input id="item-name" name="item_name" type="text" size="10" value="${expense.name}"></input></td>
-            <td><input id="item-amount" name="item_amount" type="text" size="8" value="${expense.amount.toFixed(2)}"></input></td>
+            <td><input id="item-amount" name="item_amount" type="text" size="8" inputmode="decimal" value="${expense.amount.toFixed(2)}"></input></td>
             <td><input id="item-date" name="item_date" type="date" value="${expense.date}"></input></td>
             <td>
                 <span hx-put="/expense/${expenseItem}/" hx-target="#expense-table" hx-swap="outerHTML" hx-include="#item-name, #item-amount, #item-date">Save</span>

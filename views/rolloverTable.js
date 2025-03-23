@@ -59,7 +59,6 @@ function createRolloverTableTemplate ({ month }) {
 
     const spendItemsByCategory = _.groupBy(spendItemsRaw, 'category');
     const rolloverLines = _.map(spendItemsByCategory, (spendItems, category) => {
-        console.log('category', category);
         const categoryStartAmount = _.sumBy(spendItems, (spendItem) => {
             if (!spendItem.is_tracked) {
                 return 0;
@@ -67,7 +66,6 @@ function createRolloverTableTemplate ({ month }) {
             return spendItem.amount;
         });
         const expensesForCategory = _.filter(expenses, (expense) => {
-            console.log('expense, spendItems', expense, spendItems);
             return _.some(spendItems, (spendItem) => spendItem.key === expense.spend_item);
         }
         );

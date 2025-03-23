@@ -269,7 +269,6 @@ app.put('/spend/:spendItem', (req, res) => {
 app.put('/spend/:spendItem/tracked', (req, res) => {
     const { spendItem } = req.params;
     const { is_tracked } = req.body;
-    console.log(is_tracked);
 
     const spend_itemQuery = database.prepare(`
         SELECT

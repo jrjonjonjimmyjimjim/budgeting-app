@@ -2,5 +2,6 @@
     "httpsOptions": {
         "key": "/etc/letsencrypt/...",
         "cert": "/etc/letsencrypt/..."
-    }
+    },
+    "development": false
 }

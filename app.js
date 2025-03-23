@@ -13,6 +13,14 @@ import createNewSpendItemTemplate from './views/newSpendItem.js';
 import createExpenseTableTemplate from './views/expenseTable.js';
 import createNewExpenseItemTemplate from './views/newExpenseItem.js';
 import createExpenseItemTemplate from './views/expenseItem.js';
+import http from 'http';
+import https from 'https';
+import fs from 'fs';
+import config from './config.json' with { type: 'json' };
+
+const HTTP_PORT = 80;
+const HTTP_DEVELOPMENT_PORT = 8080;
+const HTTPS_PORT = 443;
 
 const app = express();
 app.use(express.urlencoded({ extended: false }));
@@ -380,6 +388,23 @@ app.delete('/expense/:expenseItem', (req, res) => {
     `);
 });
 
-app.listen(3000, () => {
-    console.log('App listening on port 3000');
-});
+if (config.httpsOptions.key && config.httpsOptions.cert) {
+    const httpsServer = https.createServer({
+        key: fs.readFileSync(config.httpsOptions.key),
+        cert: fs.readFileSync(config.httpsOptions.cert),
+    }, app);
+    httpsServer.listen(HTTPS_PORT, () => {
+        console.log(`HTTPS server listening on port ${HTTPS_PORT}`);
+    });
+} else {
+    const httpServer = http.createServer(app);
+    if (config.development) {
+        httpServer.listen(HTTP_DEVELOPMENT_PORT, () => {
+            console.log(`HTTP Server running on port ${HTTP_DEVELOPMENT_PORT}`);
+        });
+    } else {
+        httpServer.listen(HTTP_PORT, () => {
+            console.log(`HTTP Server running on port ${HTTP_PORT}`);
+        });
+    }
+}

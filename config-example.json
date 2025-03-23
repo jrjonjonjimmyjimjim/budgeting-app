@@ -1,6 +1,6 @@
 {
-    "postgresOptions": {
-        "user": "postgres",
-        "password": "pass"
+    "httpsOptions": {
+        "key": "/etc/letsencrypt/...",
+        "cert": "/etc/letsencrypt/..."
     }
 }

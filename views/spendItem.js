@@ -29,7 +29,7 @@ function createSpendItemTemplate({ spendItem }) {
     `);
     const expenses = expensesQuery.all(spendItem);
 
-    const totalExpensesForSpendItem = spendItem.is_tracked ? _.sumBy(expenses, 'amount') : spendItem.amount;
+    const totalExpensesForSpendItem = item.is_tracked ? _.sumBy(expenses, 'amount') : item.amount;
 
     return /*html*/`
     <tr>

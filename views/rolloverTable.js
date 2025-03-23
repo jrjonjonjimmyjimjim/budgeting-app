@@ -30,6 +30,7 @@ function createRolloverTableTemplate ({ month }) {
     const previousMonth = _calculatePreviousMonth({ month });
     const spendItemsRawQuery = database.prepare(`
         SELECT
+            key,
             name,
             amount,
             category,
@@ -48,8 +49,8 @@ function createRolloverTableTemplate ({ month }) {
             expense.date date,
             expense.spend_item spend_item
         FROM
-            expense
-            INNER JOIN spend_item ON (expense.spend_item = spend_item.key)
+            spend_item
+            INNER JOIN expense ON (spend_item.key = expense.spend_item)
         WHERE
             spend_item.month = ?
         ORDER BY name
@@ -58,14 +59,17 @@ function createRolloverTableTemplate ({ month }) {
 
     const spendItemsByCategory = _.groupBy(spendItemsRaw, 'category');
     const rolloverLines = _.map(spendItemsByCategory, (spendItems, category) => {
+        console.log('category', category);
         const categoryStartAmount = _.sumBy(spendItems, (spendItem) => {
             if (!spendItem.is_tracked) {
                 return 0;
             }
             return spendItem.amount;
         });
-        const expensesForCategory = _.filter(expenses, (expense) =>
-            _.some(spendItems, (spendItem) => spendItem.name === expense.spend_item)
+        const expensesForCategory = _.filter(expenses, (expense) => {
+            console.log('expense, spendItems', expense, spendItems);
+            return _.some(spendItems, (spendItem) => spendItem.key === expense.spend_item);
+        }
         );
         const expensesAmount = _.sumBy(expensesForCategory, 'amount');
         return {

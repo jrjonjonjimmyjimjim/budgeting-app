@@ -15,6 +15,7 @@ function createSummaryTemplate ({ month }) {
     const incomeItems = incomeItemsQuery.all(month);
     const spendItemsQuery = database.prepare(`
         SELECT
+            key,
             name,
             amount,
             category,
@@ -57,6 +58,7 @@ function createSummaryTemplate ({ month }) {
     const previousMonth = _calculatePreviousMonth({ month });
     const prevMonthSpendItemsRawQuery = database.prepare(`
         SELECT
+            key,
             name,
             amount,
             category,
@@ -93,7 +95,7 @@ function createSummaryTemplate ({ month }) {
             return spendItem.amount;
         });
         const expensesForCategory = _.filter(prevMonthExpenses, (expense) =>
-            _.some(spendItems, (spendItem) => spendItem.name === expense.spend_item)
+            _.some(spendItems, (spendItem) => spendItem.key === expense.spend_item)
         );
         const expensesAmount = _.sumBy(expensesForCategory, 'amount');
         return {

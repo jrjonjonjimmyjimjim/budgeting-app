@@ -151,11 +151,13 @@ app.post('/income/new_item/:month', (req, res) => {
     const { month } = req.params;
     const { item_name, item_amount } = req.body;
 
-    const income_itemInsert = database.prepare(`
-        INSERT INTO income_item (name, amount, month)
-        VALUES (?, ?, ?)
-    `);
-    income_itemInsert.run(item_name, item_amount, month);
+    if (!isNaN(item_amount)) {
+        const income_itemInsert = database.prepare(`
+            INSERT INTO income_item (name, amount, month)
+            VALUES (?, ?, ?)
+        `);
+        income_itemInsert.run(item_name, item_amount, month);
+    }
 
     res.set('HX-Trigger', 'recalc-totals');
     res.send(createIncomeTableTemplate({ month }));
@@ -165,11 +167,13 @@ app.post('/spend/new_item/:month/:category/', (req, res) => {
     const { month, category } = req.params;
     const { item_name, item_amount } = req.body;
 
-    const spend_itemInsert = database.prepare(`
-        INSERT INTO spend_item (name, amount, month, category, is_tracked)
-        VALUES (?, ?, ?, ?, ?)
-    `);
-    spend_itemInsert.run(item_name, item_amount, month, category, 1);
+    if (!isNaN(item_amount)) {
+        const spend_itemInsert = database.prepare(`
+            INSERT INTO spend_item (name, amount, month, category, is_tracked)
+            VALUES (?, ?, ?, ?, ?)
+        `);
+        spend_itemInsert.run(item_name, item_amount, month, category, 1);
+    }
 
     res.set('HX-Trigger', 'recalc-totals');
     res.send(createSpendTableTemplate({ month, category }));
@@ -203,11 +207,13 @@ app.post('/expense/new_item/:spendItem/', (req, res) => {
     `);
     const spendItemDetails = spendItemQuery.get(spendItem);
 
-    const expenseInsert = database.prepare(`
-        INSERT INTO expense (name, amount, date, spend_item)
-        VALUES (?, ?, ?, ?)
-    `);
-    expenseInsert.run(item_name, item_amount, item_date, spendItem);
+    if (!isNaN(item_amount)) {
+        const expenseInsert = database.prepare(`
+            INSERT INTO expense (name, amount, date, spend_item)
+            VALUES (?, ?, ?, ?)
+        `);
+        expenseInsert.run(item_name, item_amount, item_date, spendItem);
+    }
 
     res.send(`
         ${createExpenseTableTemplate({ spendItem })}
@@ -228,13 +234,15 @@ app.put('/income/:incomeItem', (req, res) => {
             key = ?
     `);
     const income_item = income_itemQuery.get(incomeItem);
-    // TODO: Find existing expenses that were pointing to this income item and update them
-    const income_itemUpdate = database.prepare(`
-        UPDATE income_item
-        SET name = ?, amount = ?
-        WHERE key = ?
-    `);
-    income_itemUpdate.run(item_name, item_amount, incomeItem);
+
+    if (!isNaN(item_amount)) {
+        const income_itemUpdate = database.prepare(`
+            UPDATE income_item
+            SET name = ?, amount = ?
+            WHERE key = ?
+        `);
+        income_itemUpdate.run(item_name, item_amount, incomeItem);
+    }
     
     res.set('HX-Trigger', 'recalc-totals');
     res.send(createIncomeTableTemplate({ month: income_item.month }));
@@ -255,12 +263,14 @@ app.put('/spend/:spendItem', (req, res) => {
     `);
     const spend_item = spend_itemQuery.get(spendItem);
 
-    const spend_itemUpdate = database.prepare(`
-        UPDATE spend_item
-        SET name = ?, amount = ?
-        WHERE key = ?
-    `);
-    spend_itemUpdate.run(item_name, item_amount, spendItem);
+    if (!isNaN(item_amount)) {
+        const spend_itemUpdate = database.prepare(`
+            UPDATE spend_item
+            SET name = ?, amount = ?
+            WHERE key = ?
+        `);
+        spend_itemUpdate.run(item_name, item_amount, spendItem);
+    }
     
     res.set('HX-Trigger', 'recalc-totals');
     res.send(createSpendTableTemplate({ month: spend_item.month, category: spend_item.category }));
@@ -309,12 +319,14 @@ app.put('/expense/:expenseItem', (req, res) => {
     `);
     const expense = expenseQuery.get(expenseItem);
 
-    const expenseUpdate = database.prepare(`
-        UPDATE expense
-        SET name = ?, amount = ?, date = ?
-        WHERE key = ?
-    `);
-    expenseUpdate.run(item_name, item_amount, item_date, expenseItem);
+    if (!isNaN(item_amount)) {
+        const expenseUpdate = database.prepare(`
+            UPDATE expense
+            SET name = ?, amount = ?, date = ?
+            WHERE key = ?
+        `);
+        expenseUpdate.run(item_name, item_amount, item_date, expenseItem);
+    }
     
     res.send(`
         ${createExpenseTableTemplate({ spendItem: expense.spend_item })}

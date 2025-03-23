@@ -1,9 +1,7 @@
-import database from '../database.js';
-
 function createNewExpenseItemTemplate ({ spendItem }) {
     const today = new Date();
-    const timezoneOffset = today.getTimezoneOffset();
-    const todayTimeDateString = new Date(today - (timezoneOffset * 60 * 1000)).toISOString();
+    const MT_TZ_OFFSET = 360;
+    const todayTimeDateString = new Date(today - (MT_TZ_OFFSET * 60 * 1000)).toISOString();
     const todayDateString = todayTimeDateString.split('T')[0];
     return /*html*/`
         <tr>

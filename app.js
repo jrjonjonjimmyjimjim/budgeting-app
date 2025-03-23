@@ -1,5 +1,7 @@
 import _ from 'lodash';
 import express from 'express';
+import basicAuth from 'express-basic-auth';
+import users from './users.json' with { type: 'json' };
 import database from './database.js';
 import createRootTemplate from './views/root.js';
 import createSummaryTemplate from './views/summary.js';
@@ -26,6 +28,14 @@ const app = express();
 app.use(express.urlencoded({ extended: false }));
 
 app.use(express.static('public'));
+
+app.use(
+    basicAuth({
+        users,
+        challenge: true,
+        unauthorizedResponse: 'Oopsies. Log in.',
+    })
+);
 
 app.get('/', (req, res) => {
     const currentDate = new Date();

@@ -1,5 +1,5 @@
 # budgeting-app
-Generic budgeting app striving to be lightweight.
+Generic budgeting app striving to be lightweight. Implements basic authentication over HTTPS.
 ## Technologies
 - HTMX
 - Express.JS

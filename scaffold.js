@@ -15,7 +15,8 @@ database.exec(`
         amount REAL,
         month INTEGER,
         category TEXT,
-        is_tracked INTEGER
+        is_tracked INTEGER,
+        notes TEXT
     );
 
     CREATE TABLE expense (

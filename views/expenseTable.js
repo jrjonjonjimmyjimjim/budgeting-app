@@ -16,7 +16,8 @@ function createExpenseTableTemplate ({ spendItem }) {
         SELECT
             name,
             category,
-            is_tracked
+            is_tracked,
+            notes
         FROM
             spend_item
         WHERE
@@ -45,8 +46,22 @@ function createExpenseTableTemplate ({ spendItem }) {
                 <h2>Expenses for ${spend_item.name}</h2>
             </div>
             <div class="card-body">
-                <label for="is_tracked">Track Expenses</label>
-                <input hx-put="/spend/${spendItem}/tracked/" hx-target="#spend-${spend_item.category}" hx-swap="outerHTML" hx-include="#is-tracked" id="is-tracked" name="is_tracked" type="checkbox" ${spend_item.is_tracked ? `checked` : ``}></input>
+                <div class="container">
+                    <div class="row">
+                        <div class="col">
+                            <div class="vstack gap-2">
+                                <div>
+                                    <label for="is_tracked">Track Expenses</label>
+                                    <input hx-put="/spend/${spendItem}/tracked/" hx-target="#spend-${spend_item.category}" hx-swap="outerHTML" hx-include="#is-tracked" id="is-tracked" name="is_tracked" type="checkbox" ${spend_item.is_tracked ? `checked` : ``}></input>
+                                </div>
+                                <h3 hx-put="/spend/${spendItem}/notes/" hx-swap="none" hx-include="#notes" class="btn btn-light">Save Notes</h3>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <textarea id="notes" name="notes" rows="3" cols="30">${spend_item.notes ?? ''}</textarea>
+                        </div>
+                    </div>
+                </div>
                 <hr>
                 <table class="table table-striped">
                 <thead>

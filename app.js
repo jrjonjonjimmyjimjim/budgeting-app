@@ -302,6 +302,31 @@ app.put('/spend/:spendItem/tracked', (req, res) => {
     res.send(createSpendTableTemplate({ month: spend_item.month, category: spend_item.category }));
 });
 
+app.put('/spend/:spendItem/notes', (req, res) => {
+    const { spendItem } = req.params;
+    const { notes } = req.body;
+
+    const spend_itemQuery = database.prepare(`
+        SELECT
+            month,
+            category
+        FROM
+            spend_item
+        WHERE
+            key = ?
+    `);
+    const spend_item = spend_itemQuery.get(spendItem);
+
+    const spend_itemUpdate = database.prepare(`
+        UPDATE spend_item
+        SET notes = ?
+        WHERE key = ?
+    `);
+    spend_itemUpdate.run(notes, spendItem);
+    
+    res.send('OK');
+});
+
 app.put('/expense/:expenseItem', (req, res) => {
     const { expenseItem } = req.params;
     const { item_name, item_amount, item_date } = req.body;

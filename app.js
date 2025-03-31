@@ -144,7 +144,7 @@ app.get('/copy/:previousMonth/:month/', (req, res) => {
         spend_itemInsert.run(prevMonthSpendItem.name, prevMonthSpendItem.amount, month, prevMonthSpendItem.category, 1);
     });
 
-    res.redirect('/');
+    res.redirect(`/month/${month}`);
 });
 
 app.post('/income/new_item/:month', (req, res) => {

@@ -128,7 +128,8 @@ app.get('/copy/:previousMonth/:month/', (req, res) => {
             name,
             amount,
             category,
-            is_tracked
+            is_tracked,
+            notes
         FROM
             spend_item
         WHERE
@@ -138,10 +139,17 @@ app.get('/copy/:previousMonth/:month/', (req, res) => {
     const prevMonthSpendItems = prevMonthSpendItemsQuery.all(previousMonth);
     _.forEach(prevMonthSpendItems, (prevMonthSpendItem) => {
         const spend_itemInsert = database.prepare(`
-            INSERT INTO spend_item (name, amount, month, category, is_tracked)
-            VALUES (?, ?, ?, ?, ?)
+            INSERT INTO spend_item (name, amount, month, category, is_tracked, notes)
+            VALUES (?, ?, ?, ?, ?, ?)
         `);
-        spend_itemInsert.run(prevMonthSpendItem.name, prevMonthSpendItem.amount, month, prevMonthSpendItem.category, 1);
+        spend_itemInsert.run(
+            prevMonthSpendItem.name,
+            prevMonthSpendItem.amount,
+            month,
+            prevMonthSpendItem.category,
+            prevMonthSpendItem.is_tracked,
+            prevMonthSpendItem.notes
+        );
     });
 
     res.redirect(`/month/${month}`);
